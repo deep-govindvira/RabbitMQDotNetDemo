@@ -64,11 +64,9 @@ public class RabbitMQProducerService : IProducerService
         using (LogContext.PushProperty("CorrelationId", correlationId))
         {
             _logger.LogInformation(
-                "Published {@Message} with Id {Id} to {Queue} queue",
+                "Published {@Message} to {Queue} queue",
                 message,
-                message?.GetType().GetProperty("Id")?.GetValue(message),
                 _rabbitMQConfiguration.QueueName);
-
         }
     }
 }

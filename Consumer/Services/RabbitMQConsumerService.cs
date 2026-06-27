@@ -49,30 +49,13 @@ public class RabbitMQConsumerService : IConsumerService
 
         consumer.ReceivedAsync += async (_, e) =>
         {
-
-            if (e.BasicProperties.Headers != null)
-{
-    foreach (var header in e.BasicProperties.Headers)
-    {
-        var value = header.Value switch
-        {
-            byte[] bytes => Encoding.UTF8.GetString(bytes),
-            _ => header.Value?.ToString()
-        };
-
-        _logger.LogInformation(
-            "Header: {Key} = {Value}",
-            header.Key,
-            value);
-    }
-}
             var correlationId = GetHeader(e, "CorrelationId");
 
             using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
             {
-                _logger.LogInformation("Consumed message");
-
                 var json = Encoding.UTF8.GetString(e.Body.ToArray());
+
+                _logger.LogInformation("Consumed {@Message} from {Queue} queue", json, _rabbitMQConfiguration.QueueName);
 
                 var order = JsonSerializer.Deserialize<Order>(json);
 
